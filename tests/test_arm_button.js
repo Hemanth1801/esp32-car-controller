@@ -1,0 +1,18 @@
+'use strict';
+const assert=require('node:assert/strict'),M=require('../web/mapping.js');
+const input=new M.InputSession(),mapping={...M.defaults,inputSource:'wheel'};
+const pad={index:0,id:'Wheel',connected:true,axes:[0],buttons:[{value:1}]};
+const sample=source=>input.sample({pad,mapping,source:source||'wheel'});
+assert.equal(sample().armPressed,false,'Held at connection must not auto-arm');
+pad.buttons[0].value=0;assert.equal(sample().armPressed,false);
+pad.buttons[0].value=1;assert.equal(sample().armPressed,true,'Button 0 fresh press requests Arm');
+assert.equal(sample().armPressed,false,'Holding cannot repeat Arm');
+input.reset();assert.equal(sample().armPressed,false,'Held through a reset cannot re-arm');
+pad.buttons[0].value=0;sample();pad.buttons[0].value=1;assert.equal(sample().armPressed,true);
+assert.equal(sample('keyboard').armPressed,false,'Keyboard source ignores wheel Arm');
+assert.equal(sample().armPressed,false,'Switching back while held cannot arm');
+pad.connected=false;sample();pad.connected=true;assert.equal(sample().armPressed,false,'Held through reconnection cannot arm');
+pad.buttons=[];sample();pad.buttons=[{value:1}];assert.equal(sample().armPressed,false,'Missing button is not a release');
+assert.equal(M.armBinding,'button:0');assert.equal(M.armBindingConflict(mapping),'');
+for(const key of ['steerInput','accelInput','brakeInput','stopInput','reverseInput'])assert.match(M.armBindingConflict({...mapping,[key]:'button:0'}),/reserved for Arm/);
+console.log('Button 0 Arm passed: press edges, held/reset/reconnect/source changes, missing input and binding conflicts.');

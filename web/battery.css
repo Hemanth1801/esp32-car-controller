@@ -1,0 +1,12 @@
+.battery-panel{display:flex;flex-wrap:wrap;align-items:center;gap:10px 20px;margin:16px 0;padding:14px 18px;border:1px solid #ffffff24;border-radius:12px;background:#171e24;color:#eaf1f9}
+.battery-panel h2{margin:0;font:600 14px/1.4 system-ui,sans-serif}
+.battery-panel strong{margin-left:auto;font:750 20px/1.3 system-ui,sans-serif;color:#a7b8cb}
+.battery-panel p{flex-basis:100%;margin:0;font:12px/1.5 system-ui,sans-serif;color:#a7b8cb}
+.battery-panel meter{width:100%;height:12px;accent-color:#90efd5}
+.battery-panel meter[hidden]{display:none}
+.battery-panel[data-state=ready] strong{color:#90efd5}
+.battery-panel[data-state=low] strong{color:#ffce90}
+.phone-app>.battery-panel{margin:0;padding:8px 12px;gap:3px 12px}
+.phone-app>.battery-panel h2{font-size:12px}
+.phone-app>.battery-panel strong{font-size:16px}
+.phone-app>.battery-panel p{font-size:10px}

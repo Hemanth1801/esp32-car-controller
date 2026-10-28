@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#101310"><title>ESP Car | Tilt controller</title><link rel="stylesheet" href="/phone.css"><link rel="stylesheet" href="/battery.css"></head><body>
+<main class="phone-app">
+<header><a class="brand" id="dashboardLink" href="/controls">ESP <span>/</span> CAR</a><span id="connection" class="connection">CONNECTING</span><button id="stop" class="stop">STOP</button></header>
+<section id="carBattery" class="battery-panel" data-state="checking" aria-label="Car battery"><h2>Car battery</h2><strong data-battery-value>Checking&hellip;</strong><meter min="0" max="100" low="20" high="50" optimum="100" value="0" aria-label="Car battery charge" hidden></meter><p data-battery-detail>Waiting for a battery reading from the car.</p></section>
+<section class="setup" aria-label="Tilt steering setup"><div class="setup-actions"><button id="enableMotion">1 · Enable tilt</button><button id="centre" disabled>2 · Set centre</button><button id="arm" disabled>3 · Arm</button></div><p id="status" role="status">Enable tilt, hold the phone comfortably, then set centre.</p><p id="armHint" role="status">Enable tilt and set centre before arming.</p><p id="mode">Hold either side to drive. Release to stop.</p><p id="commandTimeoutStatus">Checking ESP command timeout?</p></section>
+<section class="pedals" aria-label="Hold to drive">
+<button id="reverse" class="pedal reverse" disabled aria-label="Hold to reverse"><span class="pedal-icon" aria-hidden="true">↓</span><strong>REVERSE</strong><small>HOLD LEFT</small></button>
+<button id="accelerate" class="pedal accelerate" disabled aria-label="Hold to accelerate forward"><span class="pedal-icon" aria-hidden="true">↑</span><strong>ACCELERATE</strong><small>HOLD RIGHT</small></button>
+<div class="tilt-hud" aria-hidden="true"><div class="wheel" id="wheel"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="39"/><circle cx="50" cy="50" r="10"/><path d="M12 45L40 51M88 45L60 51M50 61V89"/></svg></div><span id="tiltValue">CENTRE PHONE</span><span id="driveValue">RELEASED</span></div>
+</section>
+<footer><label class="limit">Drive power <input id="limit" type="range" min="10" max="100" value="100"><output id="limitValue">100%</output></label><label class="invert"><input id="invert" type="checkbox"> Reverse tilt</label><a id="setupLink" href="/wiring">Setup</a></footer>
+</main><script src="/phone-input.js"></script><script src="/battery.js"></script><script src="/control-session.js"></script><script src="/phone.js"></script></body></html>

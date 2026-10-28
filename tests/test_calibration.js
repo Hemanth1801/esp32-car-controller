@@ -1,0 +1,43 @@
+const assert=require('node:assert/strict'),M=require('../web/mapping.js');
+for(const [rest,full] of [[0,1],[1,-1],[-1,1],[0,.72],[.5,-.25]]){
+  let mapping={...M.defaults};mapping=M.capturePedal(mapping,'accel','Rest',rest);mapping=M.capturePedal(mapping,'accel','Full',full);
+  assert.equal(M.pedal(full,mapping.accelRest,mapping.accelFull),1,'Full travel must normalize to 1');
+  assert.equal(M.pedal(rest,mapping.accelRest,mapping.accelFull),0);
+  assert.equal(M.pedal((rest+full)/2,mapping.accelRest,mapping.accelFull),.5);
+}
+assert.throws(()=>M.capturePedal({...M.defaults,accelRest:.5},'accel','Full',.5),/No pedal travel/);
+assert.throws(()=>M.capturePedal(M.defaults,'accel','Full',null),/Select the axis/);
+let steer=M.selectSteering({...M.defaults,inputSource:'keyboard',steerCenter:.8,steerLeft:.8,steerRight:.8,accelFull:.72},'axis:2');
+assert.equal(steer.inputSource,'wheel');assert.equal(steer.steerInput,'axis:2');
+assert.equal(steer.steerCenter,0);assert.equal(steer.steerLeft,-1);assert.equal(steer.steerRight,1);
+assert.equal(steer.accelFull,.72,'Selecting steering must preserve pedal calibration');
+assert.equal(M.steeringCalibrationError(steer),'');
+assert.match(M.steeringCalibrationError({...steer,steerLeft:0}),/no usable travel/);
+assert.match(M.steeringCalibrationError({...steer,steerLeft:1}),/no usable travel/);
+assert.throws(()=>M.captureSteering(steer,'Left',0),/No steering travel/);
+assert.throws(()=>M.captureSteering(steer,'Center',null),/detected steering/);
+steer=M.captureSteering(steer,'Center',.5);steer=M.captureSteering(steer,'Left',.54);steer=M.captureSteering(steer,'Right',.46);
+assert.equal(M.steeringCalibrationError(steer),'');
+assert.equal(M.steering(.54,.5,.54,.46,false),-1);
+assert.equal(M.steering(.46,.5,.54,.46,false),1);
+assert.ok(Math.abs(M.steering(.52,.5,.54,.46,false)+.5)<1e-9,'Small-range steering uses a calibrated dead zone');
+assert.equal(M.steering(.501,.5,.54,.46,false),0);
+// Guided pedal capture works for inverted axes and analog buttons without guessing a binding.
+const pad={index:2,id:'Pedal wheel',connected:true,axes:[0,1],buttons:[{value:0},{value:0},{value:0}]};
+const released=M.pedalSnapshot(pad);
+pad.axes[0]=.7;pad.axes[1]=-.8;pad.buttons[0].value=1;
+const candidates=M.pedalCandidates(released,pad,['axis:0']);
+assert.deepEqual(candidates.map(candidate=>candidate.binding),['axis:1'],'Steering and Arm cannot be detected as pedals');
+let detected=M.useDetectedPedal({...M.defaults,brakeInput:'button:2'},'accel',candidates[0]);
+assert.equal(detected.inputSource,'wheel');assert.equal(detected.brakeInput,'button:2');
+assert.equal(M.pedal(pad.axes[1],detected.accelRest,detected.accelFull),1);
+pad.axes[1]=1;assert.equal(M.pedal(pad.axes[1],detected.accelRest,detected.accelFull),0,'Released snapshot must not mutate with live gamepad');
+pad.buttons[1].value=.72;
+assert.ok(M.pedalCandidates(released,pad,['axis:0']).some(candidate=>candidate.binding==='button:1'));
+assert.throws(()=>M.pedalCandidates(released,{...pad,id:'Other wheel'}),/Controller changed/);
+assert.throws(()=>M.pedalCandidates(released,{...pad,connected:false}),/Controller changed/);
+assert.throws(()=>M.useDetectedPedal(M.defaults,'accel',{binding:'button:0',rest:0,full:1}),/Choose a detected/);
+assert.match(M.pedalStatus(pad,M.defaults),/not assigned/);
+detected={...detected,brakeInput:'button:1',brakeRest:0,brakeFull:.72};
+assert.match(M.pedalStatus(pad,detected),/cancels throttle/);
+console.log('Pedal and steering calibration, axis selection, stale calibration reset, small ranges and invalid captures passed');

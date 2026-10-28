@@ -1,0 +1,5 @@
+{
+  "esp_host": "192.168.4.1",
+  "control_token": "REPLACE_WITH_THE_SAME_RANDOM_TOKEN_AS_FIRMWARE",
+  "timeout_seconds": 0.15
+}

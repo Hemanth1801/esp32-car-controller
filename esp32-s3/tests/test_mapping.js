@@ -1,0 +1,12 @@
+const assert=require('node:assert/strict');
+const {read,pedal,steering,wheel}=require('../web/mapping.js');
+const m={steerInput:'axis:0',steerCenter:0,steerLeft:-1,steerRight:1,invertSteer:false,accelInput:'axis:9',accelRest:1,accelFull:-1,brakeInput:'none',brakeRest:0,brakeFull:1,brakeMode:'brake'};
+assert.equal(wheel({axes:[.7],buttons:[]},m,false).steering,.7,'Absent throttle axis must not block steering');
+assert.equal(read({axes:[],buttons:[{value:.8}]},'button:0'),.8);
+assert.equal(pedal(1,1,-1),0);assert.equal(pedal(-1,1,-1),1);assert.equal(pedal(0,1,-1),.5);
+assert.equal(pedal(.6,0,1),.6);assert.equal(pedal(0,0,0),0);
+assert.equal(steering(-1,0,-1,1,false),-1);assert.equal(steering(1,0,-1,1,true),-1);
+const b={...m,accelInput:'button:0',accelRest:0,accelFull:1,brakeInput:'button:1'};
+assert.equal(wheel({axes:[0],buttons:[{value:1},{value:1}]},b,false).throttle,0);
+assert.equal(wheel({axes:[0],buttons:[{value:1},{value:0}]},b,true).throttle,-1);
+console.log('Input mapping checks passed');

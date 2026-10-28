@@ -1,0 +1,13 @@
+.tools/
+artifacts/
+__pycache__/
+*.pyc
+relay.local.json
+hotspot.local.json
+wifi.local.json
+wifi - *.txt
+.mobile/
+firmware/car_controller/config.h
+
+camera.local.json
+firmware/car_camera/config.h
